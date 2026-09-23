@@ -95,6 +95,26 @@ pipeline {
                 }
             }
         }
+     stage('CloudFront') {
+            steps {
+ 
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-credentials',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+ 
+                    sh '''
+                    aws cloudfront create-invalidation \
+                    --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
+                    --paths "/*"
+                    '''
+ 
+                }
+            }
+        }
  
     }
 }
