@@ -40,8 +40,6 @@ pipeline {
                         -Dsonar.projectKey=frontend-sonar \
                         -Dsonar.projectName=frontend-sonar \
                         -Dsonar.sources=. \
-                        -Dsonar.host.url=http://localhost:9000 \
-                        -Dsonar.login=sqp_bc087db9f15f69768cd42891edaca950f505dfb3
                         -Dsonar.exclusions=node_modules/**,dist/**,build/**
                         '''
  
