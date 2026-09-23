@@ -60,6 +60,41 @@ pipeline {
                 }
             }
         }
+     stage('Build') {
+            steps {
+                dir('frontend') {
+                    sh 'npm run build'
+                }
+            }
+        }
+     
+     stage('Deploy S3') {
+            steps {
+ 
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-credentials',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+ 
+                    dir('frontend') {
+ 
+                        sh '''
+                        set -e
+                        echo "Testing AWS credentials.."
+                        aws sts get-caller-identity
+                        echo "Uploading to s3.."
+                        aws s3 sync dist/ \
+                        s3://$S3_BUCKET/ \
+                        --delete
+                        '''
+ 
+                    }
+                }
+            }
+        }
  
     }
 }
