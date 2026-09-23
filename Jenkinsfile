@@ -35,23 +35,24 @@ pipeline {
         }
  
         stage('SonarQube') {
-            steps {
-                dir('frontend') {
- 
-                    withSonarQubeEnv('SonarQube') {
- 
-                        sh '''
-                        sonar-scanner \
+          steps {
+            dir('frontend') {
+              script {
+                def scannerHome = tool 'SonarScanner'
+
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=frontend-sonar \
                         -Dsonar.projectName=frontend-sonar \
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=node_modules/**,dist/**,build/**
-                        '''
- 
-                    }
+                    """
                 }
             }
         }
+    }
+}
  
         stage('Quality Gate') {
             steps {
