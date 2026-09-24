@@ -7,7 +7,7 @@ pipeline {
         GIT_REPO = 'https://github.com/inamulhasankiaq-devops/smart-task-inam.git'
         GIT_BRANCH = 'main'
 
-        HARBOR_REGISTRY = 'http://localhost'
+        HARBOR_REGISTRY = 'localhost'
 
         HARBOR_PROJECT = 'smart-task'
 
