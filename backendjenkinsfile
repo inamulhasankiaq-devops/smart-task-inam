@@ -119,24 +119,31 @@ pipeline {
         }
 
 
-         stage('SonarQube') {
-          steps {
-              script {
-                def scannerHome = tool 'SonarScanner'
- 
+    stage('SonarQube') {
+    steps {
+        script {
+            def scannerHome = tool 'SonarScanner'
+
+            withCredentials([
+                string(
+                    credentialsId: 'backend-sonar-token',
+                    variable: 'SONAR_TOKEN'
+                )
+            ]) {
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=backend-sonar \
                         -Dsonar.projectName=backend-sonar \
                         -Dsonar.sources=. \
-                        -Dsonar.exclusions=node_modules/**,dist/**,build/**
+                        -Dsonar.exclusions=**/node_modules/**,**/.dist/**,**/build/** \
+                        -Dsonar.token=\$SONAR_TOKEN
                     """
                 }
             }
         }
     }
-
+}
         stage('Quality Gate') {
 
             steps {
