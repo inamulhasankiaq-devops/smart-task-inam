@@ -124,12 +124,12 @@ pipeline {
         script {
             def scannerHome = tool 'SonarScanner'
 
-           // withCredentials([
-           //     string(
-           //         credentialsId: 'backend-sonar-token',
-           //         variable: 'SONAR_TOKEN'
-           //     )
-          //  ]) {
+            withCredentials([
+                string(
+                    credentialsId: 'jenkins-token',
+                    variable: 'SONAR_TOKEN'
+                )
+            ]) {
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         ${scannerHome}/bin/sonar-scanner \
@@ -137,10 +137,10 @@ pipeline {
                         -Dsonar.projectName=frontend-sonar \
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=**/node_modules/**,**/.dist/**,**/build/** \
-                       // -Dsonar.token=\$SONAR_TOKEN
+                        -Dsonar.token=\$SONAR_TOKEN
                     """
                 }
-         //  }
+           }
         }
     }
 }
