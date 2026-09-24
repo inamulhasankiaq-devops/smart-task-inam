@@ -126,6 +126,14 @@ pipeline {
                 script {
 
                     def scannerHome = tool 'SonarScanner'
+                    withCredentials([
+                        string(
+                            credentialsId:
+                            'backend-sonar-token',
+                            variable:
+                            'SONAR_TOKEN'
+                            )
+]){
 
                     withSonarQubeEnv('SonarQube') {
 
@@ -135,11 +143,13 @@ pipeline {
                             -Dsonar.projectName=backend-sonar \
                             -Dsonar.sources=auth-service_1784011000189,task-service,notification-service,report-service,api-gateway_1784010924579 \
                             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**
+                            -Dsonar.token=\$SONAR_TOKEN
                         """
                     }
                 }
             }
         }
+}
 
         stage('Quality Gate') {
 
