@@ -126,7 +126,7 @@ pipeline {
 
             withCredentials([
                 string(
-                    credentialsId: 'jenkins-token',
+                    credentialsId: 'sonar-token',
                     variable: 'SONAR_TOKEN'
                 )
             ]) {
