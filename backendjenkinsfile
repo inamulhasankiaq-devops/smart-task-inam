@@ -119,21 +119,29 @@ pipeline {
         }
 
 
-    stage('Test Sonar Authentication') {
+    stage('SonarQube') {
     steps {
-        withCredentials([
-            string(
-                credentialsId: 'backend-sonar-token',
-                variable: 'SONAR_TOKEN'
-            )
-        ]) {
-            withSonarQubeEnv('SonarQube') {
-                sh '''
-                    echo "SonarQube URL: $SONAR_HOST_URL"
-                    curl -s -u "$SONAR_TOKEN:" \
-                    "$SONAR_HOST_URL/api/authentication/validate"
-                '''
-            }
+        script {
+            def scannerHome = tool 'SonarScanner'
+
+            withCredentials([
+                string(
+                    credentialsId: 'backend-sonar-token',
+                    variable: 'SONAR_TOKEN'
+                )
+            ]) {
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.host.url=http://localhost:9000
+                        -Dsonar.projectKey=backend-sonar \
+                        -Dsonar.projectName=backend-sonar \
+                        
+                        -Dsonar.exclusions=**/node_modules/**,**/.dist/**,**/build/** \
+                        -Dsonar.token=\$SONAR_TOKEN
+                    """
+                }
+           }
         }
     }
 }
