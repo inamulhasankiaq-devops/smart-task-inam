@@ -3,7 +3,6 @@ version: "3.9"
 services:
   mongodb:
     image: mongo:7
-    container_name: mongodb
     restart: always
     ports:
       - "27017:27017"
@@ -14,7 +13,6 @@ services:
 
   auth-service:
     build: ./auth-service_1784011000189
-    container_name: auth-service
     ports:
       - "5001:5001"
     environment:
@@ -28,7 +26,6 @@ services:
 
   task-service:
     build: ./task-service
-    container_name: task-service
     ports:
       - "5002:5002"
     environment:
@@ -42,7 +39,6 @@ services:
 
   notification-service:
     build: ./notification-service
-    container_name: notification-service
     ports:
       - "5003:5003"
     environment:
@@ -56,7 +52,6 @@ services:
 
   report-service:
     build: ./report-service
-    container_name: report-service
     ports:
       - "5004:5004"
     environment:
@@ -70,7 +65,6 @@ services:
 
   api-gateway:
     build: ./api-gateway_1784010924579
-    container_name: api-gateway
     ports:
       - "5000:5000"
     environment:
@@ -86,7 +80,6 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: frontend
     ports:
       - "5173:5173"
     depends_on:
