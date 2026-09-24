@@ -133,11 +133,11 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.host.url=http://localhost:9000
                         -Dsonar.projectKey=backend-sonar \
                         -Dsonar.projectName=backend-sonar \
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=**/node_modules/**,**/.dist/**,**/build/** \
+                        -Dsonar.host.url=http://localhost:9000 \
                         -Dsonar.token=\$SONAR_TOKEN
                     """
                 }
