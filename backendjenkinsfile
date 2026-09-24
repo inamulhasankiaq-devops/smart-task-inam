@@ -277,6 +277,77 @@ pipeline {
             }
         }
 
+        stage('Deploy Backend to Kubernetes') {
+
+            steps {
+
+                sh '''
+
+                    echo "Updating Kubernetes deployments..."
+
+                    kubectl -n $K8S_NAMESPACE set image \
+                    deployment/auth-service \
+                    auth-service=$HARBOR_REGISTRY/$HARBOR_PROJECT/auth-service:$IMAGE_TAG
+
+                    kubectl -n $K8S_NAMESPACE set image \
+                    deployment/task-service \
+                    task-service=$HARBOR_REGISTRY/$HARBOR_PROJECT/task-service:$IMAGE_TAG
+
+                    kubectl -n $K8S_NAMESPACE set image \
+                    deployment/report-service \
+                    report-service=$HARBOR_REGISTRY/$HARBOR_PROJECT/report-service:$IMAGE_TAG
+
+                    kubectl -n $K8S_NAMESPACE set image \
+                    deployment/notification-service \
+                    notification-service=$HARBOR_REGISTRY/$HARBOR_PROJECT/notification-service:$IMAGE_TAG
+
+                    kubectl -n $K8S_NAMESPACE set image \
+                    deployment/api-gateway \
+                    api-gateway=$HARBOR_REGISTRY/$HARBOR_PROJECT/api-gateway:$IMAGE_TAG
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+
+            steps {
+
+                sh '''
+
+                    kubectl -n $K8S_NAMESPACE rollout status \
+                    deployment/auth-service \
+                    --timeout=180s
+
+                    kubectl -n $K8S_NAMESPACE rollout status \
+                    deployment/task-service \
+                    --timeout=180s
+
+                    kubectl -n $K8S_NAMESPACE rollout status \
+                    deployment/report-service \
+                    --timeout=180s
+
+                    kubectl -n $K8S_NAMESPACE rollout status \
+                    deployment/notification-service \
+                    --timeout=180s
+
+                    kubectl -n $K8S_NAMESPACE rollout status \
+                    deployment/api-gateway \
+                    --timeout=180s
+                '''
+            }
+        }
+
+        stage('Check Kubernetes Pods') {
+
+            steps {
+
+                sh '''
+                    kubectl get pods -n $K8S_NAMESPACE
+                    kubectl get svc -n $K8S_NAMESPACE
+                '''
+            }
+        }
+    }
 
 
     }
