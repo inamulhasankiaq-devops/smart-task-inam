@@ -7,13 +7,17 @@ pipeline {
         GIT_REPO = 'https://github.com/inamulhasankiaq-devops/smart-task-inam.git'
         GIT_BRANCH = 'main'
 
-        HARBOR_REGISTRY = 'localhost:80'
+        HARBOR_REGISTRY = '192.168.1.3:80'
 
         HARBOR_PROJECT = 'smart-task'
 
         IMAGE_TAG = "${BUILD_NUMBER}"
 
-        K8S_NAMESPACE = 'smart-task'
+        EC2_HOST = '3.110.46.199'
+        EC2_USER = 'ubuntu'
+
+        // Project directory on EC2
+        EC2_APP_DIR = '/home/ubuntu/smart-task-inam'
     }
 
 
@@ -276,6 +280,120 @@ pipeline {
                 '''
             }
         }
+        stage('Deploy to EC2') {
+
+            steps {
+
+                echo '========================================'
+                echo 'Deploying backend to EC2'
+                echo '========================================'
+
+                sshagent(credentials: ['ec2-ssh-key']) {
+
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'harbor-credentials',
+                            usernameVariable: 'HARBOR_USERNAME',
+                            passwordVariable: 'HARBOR_PASSWORD'
+                        )
+                    ]) {
+
+                        sh """
+
+                            ssh -o StrictHostKeyChecking=no \
+                            ${EC2_USER}@${EC2_HOST} '
+
+                                set -e
+
+                                echo "Connected to EC2"
+
+                                cd ${EC2_APP_DIR}
+
+
+                                echo "========================================"
+                                echo "Pulling latest Git code"
+                                echo "========================================"
+
+                                git pull origin ${GIT_BRANCH}
+
+
+                                echo "========================================"
+                                echo "Logging into Harbor"
+                                echo "========================================"
+
+                                echo "${HARBOR_PASSWORD}" | \
+                                docker login \
+                                ${HARBOR_REGISTRY} \
+                                -u "${HARBOR_USERNAME}" \
+                                --password-stdin
+
+
+                                echo "========================================"
+                                echo "Downloading new Docker images"
+                                echo "========================================"
+
+                                IMAGE_TAG=${IMAGE_TAG} \
+                                docker compose pull
+
+
+                                echo "========================================"
+                                echo "Stopping old containers"
+                                echo "========================================"
+
+                                docker compose down
+
+
+                                echo "========================================"
+                                echo "Starting new containers"
+                                echo "========================================"
+
+                                IMAGE_TAG=${IMAGE_TAG} \
+                                docker compose up -d
+
+
+                                echo "========================================"
+                                echo "Deployment status"
+                                echo "========================================"
+
+                                docker compose ps
+
+                            '
+                        """
+                    }
+                }
+            }
+        }
+
+
+        // =====================================================
+        // 9. VERIFY DEPLOYMENT
+        // =====================================================
+
+        stage('Verify EC2') {
+
+            steps {
+
+                sshagent(credentials: ['ec2-ssh-key']) {
+
+                    sh """
+
+                        ssh -o StrictHostKeyChecking=no \
+                        ${EC2_USER}@${EC2_HOST} '
+
+                            cd ${EC2_APP_DIR}
+
+                            echo "Running containers:"
+                            docker compose ps
+
+                            echo "Docker containers:"
+                            docker ps
+
+                        '
+                    """
+                }
+            }
+        }
+    }
 
     stage('Deploy backend with docker compose'){
         steps{
@@ -289,9 +407,33 @@ pipeline {
             '''
         }
     }
+        post {
+
+        success {
+
+            echo '''
+            ========================================
+              BACKEND DEPLOYMENT SUCCESSFUL
+            ========================================
+            '''
+
+            echo "Backend deployed to EC2."
+        }
+
+
+        failure {
+
+            echo '''
+            ========================================
+                BACKEND DEPLOYMENT FAILED
+            ========================================
+            '''
+
+            echo "Check Jenkins console output."
+        }
 
     }
 
 
     }
-
+}
