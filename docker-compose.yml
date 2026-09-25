@@ -11,8 +11,6 @@ services:
 
   auth-service:
     build: ./auth-service_1784011000189
-    ports:
-      - "5001:5001"
     environment:
       - PORT=5001
       - MONGO_URI=mongodb://mongodb:27017/authdb
@@ -24,8 +22,6 @@ services:
 
   task-service:
     build: ./task-service
-    ports:
-      - "5002:5002"
     environment:
       - PORT=5002
       - MONGO_URI=mongodb://mongodb:27017/taskdb
@@ -37,8 +33,6 @@ services:
 
   notification-service:
     build: ./notification-service
-    ports:
-      - "5003:5003"
     environment:
       - PORT=5003
       - MONGO_URI=mongodb://mongodb:27017/notificationdb
@@ -50,8 +44,6 @@ services:
 
   report-service:
     build: ./report-service
-    ports:
-      - "5004:5004"
     environment:
       - PORT=5004
       - MONGO_URI=mongodb://mongodb:27017/reportdb
@@ -63,8 +55,6 @@ services:
 
   api-gateway:
     build: ./api-gateway_1784010924579
-    ports:
-      - "5000:5000"
     environment:
       - PORT=5000
       - AUTH_SERVICE_URL=http://auth-service:5001
@@ -78,8 +68,6 @@ services:
 
   frontend:
     build: ./frontend
-    ports:
-      - "5173:5173"
     depends_on:
       - api-gateway
     networks:
