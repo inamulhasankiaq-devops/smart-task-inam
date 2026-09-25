@@ -1,8 +1,8 @@
-services:
+version: "3.9"
 
+services:
   mongodb:
     image: mongo:7
-    container_name: mongodb
     restart: always
     volumes:
       - mongo_data:/data/db
@@ -10,66 +10,68 @@ services:
       - smart-network
 
   auth-service:
-    image: 192.168.1.3:80/smart-task/auth-service:${IMAGE_TAG}
-    container_name: auth-service
+    build: ./auth-service_1784011000189
     environment:
       - PORT=5001
       - MONGO_URI=mongodb://mongodb:27017/authdb
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=MySecret@123
     depends_on:
       - mongodb
     networks:
       - smart-network
 
   task-service:
-    image: 192.168.1.3:80/smart-task/task-service:${IMAGE_TAG}
-    container_name: task-service
+    build: ./task-service
     environment:
       - PORT=5002
       - MONGO_URI=mongodb://mongodb:27017/taskdb
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=MySecret@123
     depends_on:
       - mongodb
     networks:
       - smart-network
 
   notification-service:
-    image: 192.168.1.3:80/smart-task/notification-service:${IMAGE_TAG}
-    container_name: notification-service
+    build: ./notification-service
     environment:
       - PORT=5003
       - MONGO_URI=mongodb://mongodb:27017/notificationdb
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=MySecret@123
     depends_on:
       - mongodb
     networks:
       - smart-network
 
   report-service:
-    image: 192.168.1.3:80/smart-task/report-service:${IMAGE_TAG}
-    container_name: report-service
+    build: ./report-service
     environment:
       - PORT=5004
       - MONGO_URI=mongodb://mongodb:27017/reportdb
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=MySecret@123
     depends_on:
       - mongodb
     networks:
       - smart-network
 
   api-gateway:
-    image: 192.168.1.3:80/smart-task/api-gateway:${IMAGE_TAG}
-    container_name: api-gateway
+    build: ./api-gateway_1784010924579
     ports:
       - "5000:5000"
     environment:
       - PORT=5000
       - AUTH_SERVICE_URL=http://auth-service:5001
       - TASK_SERVICE_URL=http://task-service:5002
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=MySecret@123
     depends_on:
       - auth-service
       - task-service
+    networks:
+      - smart-network
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - api-gateway
     networks:
       - smart-network
 
