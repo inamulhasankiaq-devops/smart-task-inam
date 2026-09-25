@@ -407,6 +407,8 @@ pipeline {
             '''
         }
     }
+}
+}
         post {
 
         success {
@@ -435,5 +437,5 @@ pipeline {
     }
 
 
-    }
+    
 
