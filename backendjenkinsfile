@@ -395,19 +395,6 @@ pipeline {
         }
     }
 
-    stage('Deploy backend with docker compose'){
-        steps{
-            sh '''
-                echo "Stop old docker container"
-                docker compose down
-                echo "start backend docker compose"
-                docker compose up -d
-                echo "docker status"
-                docker compose ps
-            '''
-        }
-    }
-}
 
         post {
 
