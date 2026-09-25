@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://api.smarttask.local:31358",
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -19,12 +19,12 @@ api.interceptors.request.use((config) => {
 
 // Delete Task API
 export const deleteTask = (id) => {
-  return api.delete(`/api/tasks/${id}`);
+  return api.delete(`/tasks/${id}`);
 };
 
 // Update Task API
 export const updateTask = (id, data) => {
-  return api.put(`/api/tasks/${id}`, data);
+  return api.put(`/tasks/${id}`, data);
 };
 
 export default api;
