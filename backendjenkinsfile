@@ -123,37 +123,33 @@ pipeline {
         // 3. SONARQUBE SCAN
         // =====================================================
 
-        stage('SonarQube Scan') {
-
-            steps {
-
-                script {
-
-                    def scannerHome = tool 'SonarScanner'
-
-                    withCredentials([
-                        string(
-                            credentialsId: 'sonar-token',
-                            variable: 'SONAR_TOKEN'
-                        )
-                    ]) {
-
-                        withSonarQubeEnv('SonarQube') {
-
-                            sh """
-                                ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=backend-sonar \
-                                -Dsonar.projectName=backend-sonar \
-                                -Dsonar.sources=. \
-                                -Dsonar.exclusions=**/node_modules/**,**/.dist/**,**/build/** \
-                                -Dsonar.host.url=http://localhost:9000 \
-                                -Dsonar.token=\\\$SONAR_TOKEN
-                            """
-                        }
+            stage('SonarQube') {
+                steps {
+                    script {
+                        def scannerHome = tool 'SonarScanner'
+            
+                        withCredentials([
+                            string(
+                                credentialsId: 'sonar-token',
+                                variable: 'SONAR_TOKEN'
+                            )
+                        ]) {
+                            withSonarQubeEnv('SonarQube') {
+                                sh """
+                                    ${scannerHome}/bin/sonar-scanner \
+                                    -Dsonar.projectKey=frontend-sonar \
+                                    -Dsonar.projectName=frontend-sonar \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.exclusions=**/node_modules/**,**/.dist/**,**/build/** \
+                                    -Dsonar.host.url=http://localhost:9000 \
+                                    -Dsonar.token=\$SONAR_TOKEN
+                                """
+                            }
+                       }
                     }
                 }
             }
-        }
+
 
 
         // =====================================================
